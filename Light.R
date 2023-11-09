@@ -6,6 +6,44 @@ require(cowplot)
 require(WaveletComp)
 require(tidyquant) 
 
+#### Build ASL color palette ####
+
+# build ASL color palette
+kelp1 <- "#334736"
+kelp2 <- "#4d754f"
+kelp3 <- "#678c6c"
+
+redwood1 <- "#743e1e"
+redwood2 <- "#8d4d2b"
+redwood3 <- "#ab5732"
+
+starecho.april1 <- "#3d3556"
+starecho.april2 <- "#4f4070"
+starecho.april3 <- "#6a5499"
+
+beach1 <- "#d7d6c9"
+beach2 <- "#e2e1d3"
+beach3 <- "#f5f3ea"
+
+coral1 <- "#623f72"
+coral2 <- "#8658a4"
+
+aqua1 <- "#17817e"
+aqua2 <- "#00bbbc"
+
+wave1 <- "#2787ba"
+wave2 <- "#2c9bd6"
+
+mars1 <- "#9b4726"
+mars2 <- "#e1642f"
+
+algae1 <- "#007c45"
+algae2 <- "#00af5e"
+
+require(showtext)
+font_add_google("Barlow") # add ASL font type
+showtext_auto() # gives showtext permission to overwrite ggplot default
+
 
 setwd("C:/Users/jchawarski/OneDrive - ASL Environmental Sciences Inc/Projects/BMSC Summer Oceanography Course")
 
@@ -14,18 +52,40 @@ light <- read.csv("Data/Light Tag - MK9/2190089-Archive.csv")
 # convert Time to datetime object 
 
 light$Time <- as.POSIXct(strptime(light$Time, format="%m/%d/%Y %H:%M:%S"))
-light$Time <- as.Date(light$Time)
+
 
 light %>% filter(Dry %in% 0) %>% filter(Light.Level < 100) %>%
   ggplot(aes(x=Time, y=Light.Level)) + geom_point(color= wave2, alpha=0.1) + #geom_ma(ma_fun = SMA, n = 6, color=wave1, linetype="solid") + 
   scale_x_datetime(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") + 
   #scale_y_continuous(breaks = c(-100, -96, -92, -88, -84, -80, -76), position = "left") + 
   xlab("") + ylab("Light Level") + 
-  theme_bw() 
-  
+  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text("Barlow")) + 
   #ggtitle("Cape Bathurst AZFP - bmsc 2018")
   theme(axis.text.x = element_blank())
+
+# one minute light level
+light %>% filter(Dry %in% 0) %>% filter(Light.Level < 100) %>%
+  ggplot(aes(x=Time, y=One.Minute.Light.Level)) + geom_point(color= wave2, alpha=0.1) + #geom_ma(ma_fun = SMA, n = 6, color=wave1, linetype="solid") + 
+  scale_x_datetime(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") + 
+  #scale_y_continuous(breaks = c(-100, -96, -92, -88, -84, -80, -76), position = "left") + 
+  xlab("") + ylab("Light Level") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text("Barlow")) 
+  #ggtitle("Cape Bathurst AZFP - bmsc 2018")
+  #theme(axis.text.x = element_blank())
+
+light %>% filter(Dry %in% 0) %>% filter(Light.Level < 100) %>%
+  ggplot(aes(x=Time, y=External.Temp)) + geom_point(color= wave2, alpha=0.1) + #geom_ma(ma_fun = SMA, n = 6, color=wave1, linetype="solid") + 
+  scale_x_datetime(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") + 
+  #scale_y_continuous(breaks = c(-100, -96, -92, -88, -84, -80, -76), position = "left") + 
+  xlab("") + ylab("Light Level") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text("Barlow")) + 
+  #ggtitle("Cape Bathurst AZFP - bmsc 2018")
+  theme(axis.text.x = element_blank())
+
+
 
 
 # trim to underwater deployment using wet/dry setting (Dry=1 -> Dry, Dry=0 -> Wet)
@@ -48,7 +108,7 @@ require(oce)
     ggplot(aes(x=Time, y=sun_altitude)) + geom_point(color= wave2, alpha=0.1) + #geom_ma(ma_fun = SMA, n = 6, color=wave1, linetype="solid") + 
     scale_x_datetime(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") + 
     #scale_y_continuous(breaks = c(-100, -96, -92, -88, -84, -80, -76), position = "left") + 
-    xlab("") + ylab("Light Level") + 
+    xlab("") + ylab("sun altitude") + 
     theme_bw() 
   
   
@@ -74,8 +134,21 @@ require(oce)
   
 # use solar angle to determine light anomaly -> expected light based on solar angle minus measured light level. 
 # how does this impact DVM patterns seen in krill
+require(oce)
+CTD <- read.ctd("Data/SMP37 - CTD/BMSC_bottom_CTD_SBE37SM.cnv")
 
+ctd <- CTD[["data"]] 
+  
+ ctd <- data.frame(ctd) 
+  
+ x <- seconds(ctd$timeK)
+ y <- y %m+% years(30)
+ y <- with_tz(y, "PDT")
+y <- as.Date(x)
 
+ctd$datetime.utc <- y
+
+write.csv(ctd, "BMSC_mooring_bottomCTD.csv")
 
   #### Data Preparation ####
   # read in Echoview output (.csv) 
