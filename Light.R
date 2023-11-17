@@ -51,18 +51,19 @@ light <- read.csv("Data/Light Tag - MK9/2190089-Archive.csv")
 
 # convert Time to datetime object 
 
-light$Time <- as.POSIXct(strptime(light$Time, format="%m/%d/%Y %H:%M:%S"))
+light$Time <- as.POSIXct(strptime(light$Time, format="%m/%d/%Y %H:%M:%S"), tz="UTC")
+light$Date <- as.Date(light$Time, tz="UTC")
 
-
-light %>% filter(Dry %in% 0) %>% filter(Light.Level < 100) %>%
-  ggplot(aes(x=Time, y=Light.Level)) + geom_point(color= wave2, alpha=0.1) + #geom_ma(ma_fun = SMA, n = 6, color=wave1, linetype="solid") + 
-  scale_x_datetime(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") + 
+light %>% filter(Dry %in% 0) %>% filter(Light.Level < 100) %>% filter(ToD %in% "Day") %>%
+  filter(Time >= "2023-07-04 00:25:00 UTC" & Time < "2023-07-05 00:25:00 UTC") %>%
+  ggplot(aes(x=Time, y=Light.Level, color=ToD)) + geom_point(alpha=0.1) + #geom_ma(ma_fun = SMA, n = 6, color=wave1, linetype="solid") + 
+  #scale_x_datetime(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") + 
   #scale_y_continuous(breaks = c(-100, -96, -92, -88, -84, -80, -76), position = "left") + 
   xlab("") + ylab("Light Level") + 
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text("Barlow")) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text("Barlow")) 
   #ggtitle("Cape Bathurst AZFP - bmsc 2018")
-  theme(axis.text.x = element_blank())
+  #theme(axis.text.x = element_blank())
 
 # one minute light level
 light %>% filter(Dry %in% 0) %>% filter(Light.Level < 100) %>%

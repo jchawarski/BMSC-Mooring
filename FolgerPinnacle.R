@@ -24,8 +24,8 @@ onc.down$time <- paste(onc.down$hour, as.character("00"), as.character("00"),  s
 
 onc.down$datetime <- as.POSIXct(paste(as.character(onc.down$date), onc.down$time), format=format, tz="UTC")
 
-onc.down %>% filter(datetime >= "2023-06-23 00:00:00 UTC" & datetime < "2023-08-01 23:00:00 UTC") %>%
-  ggplot(aes(x=datetime, y=turb)) + geom_line() + theme_bw()
+onc.down %>% filter(datetime >= "2023-06-24 00:00:00 UTC" & datetime < "2023-08-01 23:00:00 UTC") %>%
+  ggplot(aes(x=datetime, y=chl)) + geom_line() + theme_bw()
 
 
 
